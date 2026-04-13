@@ -1,73 +1,50 @@
 const express = require("express");
-const axios = require("axios");
+const cors = require("cors");
+const { Client, GatewayIntentBits } = require("discord.js");
 
 const app = express();
+app.use(cors());
+app.use(express.json());
 
-// TEST ROUTE
+const client = new Client({
+  intents: [GatewayIntentBits.Guilds]
+});
+
+client.login(process.env.BOT_TOKEN);
+
+// HOME
 app.get("/", (req, res) => {
-  res.send("Backend läuft 🚀");
+  res.send("Backend running");
 });
 
-// DISCORD OAUTH CALLBACK (GEFIXT)
-app.get("/auth/callback", async (req, res) => {
-  try {
-    const code = req.query.code;
+// DISCORD OAUTH CALLBACK
+app.get("/auth/callback", (req, res) => {
+  const code = req.query.code;
 
-    if (!code) return res.send("No code provided");
-
-    // TOKEN REQUEST
-    const tokenResponse = await axios.post(
-      "https://discord.com/api/oauth2/token",
-      new URLSearchParams({
-        client_id: process.env.CLIENT_ID,
-        client_secret: process.env.CLIENT_SECRET,
-        grant_type: "authorization_code",
-        code: code,
-        redirect_uri: process.env.REDIRECT_URI
-      }),
-      {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded"
-        }
-      }
-    );
-
-    const accessToken = tokenResponse.data.access_token;
-
-    // USER INFO
-    const userResponse = await axios.get(
-      "https://discord.com/api/users/@me",
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`
-        }
-      }
-    );
-
-    const user = userResponse.data;
-
-    console.log("User logged in:", user.id, user.username);
-
-    // redirect to frontend
-    return res.redirect(
-      `${process.env.FRONTEND_URL}?discordId=${user.id}`
-    );
-
-  } catch (err) {
-    console.error(err);
-    return res.send("OAuth Error");
-  }
+  // (optional: OAuth später erweitern)
+  res.redirect(`https://cool-zabaione-c46e2c.netlify.app?discordId=USER`);
 });
 
-// BUY ROUTE (OPTIONAL)
-app.get("/buy", (req, res) => {
-  const { productId, user } = req.query;
-  console.log("ORDER:", productId, user);
+// CHECKOUT → TICKET SYSTEM
+app.post("/checkout", async (req, res) => {
+  const { user, cart } = req.body;
 
-  res.send("Order received");
+  const guild = client.guilds.cache.get(process.env.GUILD_ID);
+
+  const channel = await guild.channels.create({
+    name: `ticket-${user}`,
+    type: 0
+  });
+
+  let items = cart.map(p => `- ${p.name} (€${p.price})`).join("\n");
+
+  channel.send(
+    `🎟️ NEW ORDER\n\n👤 User: <@${user}>\n\n🛒 Items:\n${items}`
+  );
+
+  res.send("Ticket created");
 });
 
-// PORT FIX (WICHTIG FÜR RENDER)
 app.listen(process.env.PORT || 3000, () => {
-  console.log("Server running");
+  console.log("Backend running");
 });
