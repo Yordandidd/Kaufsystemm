@@ -27,9 +27,13 @@ export default function Home() {
   }, []);
 
   const login = () => {
-    window.location.href =
-      `https://discord.com/api/oauth2/authorize?client_id=1493255969030013019&redirect_uri=${BACKEND}/auth/callback&response_type=code&scope=identify`;
-  };
+  const redirect = encodeURIComponent(
+    "https://kaufsystem.onrender.com/auth/callback"
+  );
+
+  window.location.href =
+    `https://discord.com/api/oauth2/authorize?client_id=YOUR_ID&redirect_uri=${redirect}&response_type=code&scope=identify`;
+};
 
   const buy = (id) => {
     if (!user) return alert("Bitte zuerst einloggen");
