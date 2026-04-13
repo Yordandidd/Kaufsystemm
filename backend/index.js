@@ -1,55 +1,73 @@
 const express = require("express");
 const axios = require("axios");
+
 const app = express();
 
+// TEST ROUTE
 app.get("/", (req, res) => {
   res.send("Backend läuft 🚀");
 });
 
-app.use(express.json());
+// DISCORD OAUTH CALLBACK (GEFIXT)
+app.get("/auth/callback", async (req, res) => {
+  try {
+    const code = req.query.code;
 
-const BACKEND_URL = "https://kaufsystemm-1.onrender.com";
-const FRONTEND_URL = "https://cool-zabaione-c46e2c.netlify.app";
+    if (!code) return res.send("No code provided");
 
-// Discord Login Callback
-app.get("/auth/callback", async (req,res)=>{
-    res.send("OK CALLBACK");
+    // TOKEN REQUEST
+    const tokenResponse = await axios.post(
+      "https://discord.com/api/oauth2/token",
+      new URLSearchParams({
+        client_id: process.env.CLIENT_ID,
+        client_secret: process.env.CLIENT_SECRET,
+        grant_type: "authorization_code",
+        code: code,
+        redirect_uri: process.env.REDIRECT_URI
+      }),
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded"
+        }
+      }
+    );
+
+    const accessToken = tokenResponse.data.access_token;
+
+    // USER INFO
+    const userResponse = await axios.get(
+      "https://discord.com/api/users/@me",
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        }
+      }
+    );
+
+    const user = userResponse.data;
+
+    console.log("User logged in:", user.id, user.username);
+
+    // redirect to frontend
+    return res.redirect(
+      `${process.env.FRONTEND_URL}?discordId=${user.id}`
+    );
+
+  } catch (err) {
+    console.error(err);
+    return res.send("OAuth Error");
+  }
 });
 
-app.listen(process.env.PORT || 3000, () => {
-  console.log("Running");
-});
-
-  const code = req.query.code;
-
-  const data = new URLSearchParams();
-  data.append("client_id", process.env.CLIENT_ID);
-  data.append("client_secret", process.env.CLIENT_SECRET);
-  data.append("grant_type", "authorization_code");
-  data.append("code", code);
-  data.append("redirect_uri", BACKEND_URL + "/auth/callback");
-
-  const token = await axios.post(
-    "https://discord.com/api/oauth2/token",
-    data,
-    { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
-  );
-
-  const user = await axios.get("https://discord.com/api/users/@me", {
-    headers: { Authorization: `Bearer ${token.data.access_token}` }
-  });
-
-  res.redirect(`${FRONTEND_URL}?discordId=${user.data.id}`);
-});
-
-// BUY ROUTE
-app.get("/buy", async (req,res)=>{
+// BUY ROUTE (OPTIONAL)
+app.get("/buy", (req, res) => {
   const { productId, user } = req.query;
+  console.log("ORDER:", productId, user);
 
-  await axios.post("http://localhost:3001/ticket", {
-    user,
-    productId
-  });
+  res.send("Order received");
+});
 
-  res.send("Order created → ticket opened");
+// PORT FIX (WICHTIG FÜR RENDER)
+app.listen(process.env.PORT || 3000, () => {
+  console.log("Server running");
 });
