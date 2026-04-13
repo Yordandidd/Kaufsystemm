@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Elite Shop</title>
+
+<style>
+body {
+  margin:0;
+  font-family: Arial;
+  background: radial-gradient(circle at top, #111, #000);
+  color:white;
+  text-align:center;
+}
+
+h1 {
+  font-size:50px;
+  margin-top:60px;
+}
+
+.container {
+  display:flex;
+  justify-content:center;
+  gap:20px;
+  margin-top:50px;
+  flex-wrap:wrap;
+}
+
+.card {
+  background: rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.1);
+  padding:20px;
+  width:220px;
+  border-radius:15px;
+  backdrop-filter: blur(10px);
+  transition:0.3s;
+}
+
+.card:hover {
+  transform: scale(1.05);
+}
+
+button {
+  margin-top:10px;
+  padding:10px;
+  width:100%;
+  border:none;
+  border-radius:10px;
+  background:#5865F2;
+  color:white;
+  cursor:pointer;
+}
+
+button:hover {
+  background:#4752c4;
+}
+</style>
+</head>
+
+<body>
+
+<h1>⚡ G93 Reselling Shop</h1>
+<p>Login & buy instantly via Discord</p>
+
+<button onclick="login()">Login with Discord</button>
+
+<div class="container">
+
+  <div class="card">
+    <h3>Lifetime</h3>
+    <p>€20</p>
+    <button onclick="buy('683016')">Buy</button>
+  </div>
+
+  <div class="card">
+    <h3>6 Months</h3>
+    <p>€17</p>
+    <button onclick="buy('683029')">Buy</button>
+  </div>
+
+  <div class="card">
+    <h3>1 Month</h3>
+    <p>€14</p>
+    <button onclick="buy('683034')">Buy</button>
+  </div>
+
+  <div class="card">
+    <h3>1 Week</h3>
+    <p>€7</p>
+    <button onclick="buy('683022')">Buy</button>
+  </div>
+
+</div>
+
+<script>
+
+const BACKEND = "https://kaufsystem.onrender.com";
+
+function login(){
+  window.location.href =
+  "https://kaufsystem.onrender.com/auth/discord/callback" 
+  + BACKEND + "/auth/callback&response_type=code&scope=identify";
+}
+
+function buy(id){
+  const user = localStorage.getItem("discordId");
+  if(!user){
+    alert("Login first");
+    return;
+  }
+
+  window.location.href = `${BACKEND}/buy?productId=${id}&user=${user}`;
+}
+
+const params = new URLSearchParams(window.location.search);
+if(params.get("discordId")){
+  localStorage.setItem("discordId", params.get("discordId"));
+}
+
+</script>
+
+</body>
+</html>
