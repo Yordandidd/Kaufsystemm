@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 
 const BACKEND = "https://kaufsystem.onrender.com";
@@ -26,18 +25,20 @@ export default function Home() {
     }
   }, []);
 
+  // ✅ FIXED LOGIN FUNCTION
   const login = () => {
-  const redirect = encodeURIComponent(
-    "https://kaufsystemm-1.onrender.com/auth/callback"
-  );
+    const url =
+      "https://discord.com/api/oauth2/authorize" +
+      "?client_id=1493255969030013019" +
+      "&redirect_uri=" +
+      encodeURIComponent(BACKEND + "/auth/callback") +
+      "&response_type=code" +
+      "&scope=identify";
 
-  window.location.href =
-`https://discord.com/api/oauth2/authorize
-?client_id=1493255969030013019
-&redirect_uri=${encodeURIComponent("https://kaufsystemm-1.onrender.com/auth/callback")}
-&response_type=code
-&scope=identify`;
+    window.location.href = url;
+  };
 
+  // ✅ FIXED BUY FUNCTION (outside login!)
   const buy = (id) => {
     if (!user) return alert("Bitte zuerst einloggen");
 
