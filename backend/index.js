@@ -4,7 +4,7 @@ const app = express();
 
 app.use(express.json());
 
-const BACKEND_URL = "https://kaufsystem.onrender.com";
+const BACKEND_URL = "https://kaufsystemm.onrender.com";
 const FRONTEND_URL = "https://cool-zabaione-c46e2c.netlify.app";
 
 // Discord Login Callback
