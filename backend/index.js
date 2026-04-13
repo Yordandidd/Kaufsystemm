@@ -13,6 +13,12 @@ const FRONTEND_URL = "https://cool-zabaione-c46e2c.netlify.app";
 
 // Discord Login Callback
 app.get("/auth/callback", async (req,res)=>{
+    res.send("OK CALLBACK");
+});
+
+app.listen(process.env.PORT || 3000, () => {
+  console.log("Running");
+});
 
   const code = req.query.code;
 
@@ -47,5 +53,3 @@ app.get("/buy", async (req,res)=>{
 
   res.send("Order created → ticket opened");
 });
-
-app.listen(3000, ()=>console.log("Backend running"));
