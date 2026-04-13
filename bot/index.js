@@ -15,7 +15,7 @@ client.once("ready", () => {
 app.post("/ticket", async (req, res) => {
   const { user, productId } = req.body;
 
-  const guild = client.guilds.cache.get("YOUR_GUILD_ID");
+  const guild = client.guilds.cache.get("1484956843016061008");
 
   const channel = await guild.channels.create({
     name: `ticket-${user}`,
