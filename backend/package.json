@@ -1,5 +1,5 @@
 {
-  "name": "kaufsystem-backend",
+  "name": "backend",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -7,6 +7,7 @@
   },
   "dependencies": {
     "express": "^4.18.2",
-    "axios": "^1.6.0"
+    "cors": "^2.8.5",
+    "discord.js": "^14.0.0"
   }
 }
