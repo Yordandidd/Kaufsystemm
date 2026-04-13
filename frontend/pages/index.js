@@ -32,8 +32,11 @@ export default function Home() {
   );
 
   window.location.href =
-    `https://discord.com/api/oauth2/authorize?client_id=YOUR_ID&redirect_uri=${redirect}&response_type=code&scope=identify`;
-};
+`https://discord.com/api/oauth2/authorize
+?client_id=1493255969030013019
+&redirect_uri=${encodeURIComponent("https://kaufsystemm-1.onrender.com/auth/callback")}
+&response_type=code
+&scope=identify`;
 
   const buy = (id) => {
     if (!user) return alert("Bitte zuerst einloggen");
