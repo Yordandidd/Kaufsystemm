@@ -28,7 +28,7 @@ export default function Home() {
 
   const login = () => {
   const redirect = encodeURIComponent(
-    "https://kaufsystemm.onrender.com/auth/callback"
+    "https://kaufsystemm-1.onrender.com/auth/callback"
   );
 
   window.location.href =
