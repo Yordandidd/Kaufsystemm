@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 const PRODUCTS = [
   { id: "683016", name: "Lifetime", price: "€20" },
   { id: "683029", name: "6 Month", price: "€17" },
-  { id: "683034", name: "1 Month", price: "€14" }
+  { id: "683034", name: "1 Month", price: "€14" },
   { id: "683022", name: "1 Week", price: "€7" }
 ];
 
@@ -25,7 +25,7 @@ export default function Home() {
     if (!user) return alert("Login required");
 
     window.location.href =
-      `https://https://my-bot-1-zjnv.onrender.com/buy?productId=${id}&user=${user}`;
+      `https://my-bot-1-zjnv.onrender.com/buy?productId=${id}&user=${user}`;
   };
 
   return (
