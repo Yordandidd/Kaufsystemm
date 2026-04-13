@@ -1,120 +1,91 @@
 import { useEffect, useState } from "react";
 
-const BACKEND = "https://kaufsystem.onrender.com";
+const BACKEND = "https://kaufsystemm-1.onrender.com";
 
 const PRODUCTS = [
-  { id: "683016", name: "Lifetime", price: "€20" },
-  { id: "683029", name: "6 Months", price: "€17" },
-  { id: "683034", name: "1 Month", price: "€14" },
-  { id: "683022", name: "1 Week", price: "€7" }
+  { id: "683016", name: "Lifetime", price: 20 },
+  { id: "683029", name: "6 Months", price: 17 },
+  { id: "683034", name: "1 Month", price: 14 },
+  { id: "683022", name: "1 Week", price: 7 }
 ];
 
 export default function Home() {
   const [user, setUser] = useState(null);
+  const [cart, setCart] = useState([]);
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const discordId = params.get("discordId");
-
-    if (discordId) {
-      setUser(discordId);
-      localStorage.setItem("discordId", discordId);
-    } else {
-      const saved = localStorage.getItem("discordId");
-      if (saved) setUser(saved);
-    }
+    const id = localStorage.getItem("discordId");
+    if (id) setUser(id);
   }, []);
 
-  // ✅ FIXED LOGIN FUNCTION
+  // LOGIN
   const login = () => {
-    const url =
+    window.location.href =
       "https://discord.com/api/oauth2/authorize" +
-      "?client_id=1493255969030013019" +
+      "?client_id=YOUR_CLIENT_ID" +
       "&redirect_uri=" +
       encodeURIComponent(BACKEND + "/auth/callback") +
-      "&response_type=code" +
-      "&scope=identify";
-
-    window.location.href = url;
+      "&response_type=code&scope=identify";
   };
 
-  // ✅ FIXED BUY FUNCTION (outside login!)
-  const buy = (id) => {
-    if (!user) return alert("Bitte zuerst einloggen");
+  // CART
+  const addToCart = (product) => {
+    setCart([...cart, product]);
+  };
 
-    window.location.href =
-      `${BACKEND}/buy?productId=${id}&user=${user}`;
+  const removeFromCart = (id) => {
+    setCart(cart.filter((p) => p.id !== id));
+  };
+
+  const clearCart = () => setCart([]);
+
+  // CHECKOUT
+  const checkout = () => {
+    if (!user) return alert("Login first");
+
+    fetch(`${BACKEND}/checkout`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ user, cart })
+    }).then(() => {
+      alert("Ticket created!");
+      clearCart();
+    });
   };
 
   return (
-    <div style={styles.body}>
-      <h1 style={styles.title}>⚡ Elite Shop</h1>
+    <div style={{ padding: 40, color: "white", background: "#0f0f0f" }}>
+      <h1>🔥 Shop</h1>
 
       {!user ? (
-        <button style={styles.login} onClick={login}>
-          Login with Discord
-        </button>
+        <button onClick={login}>Login Discord</button>
       ) : (
-        <p>👤 Logged in: {user}</p>
+        <p>👤 {user}</p>
       )}
 
-      <div style={styles.grid}>
-        {PRODUCTS.map((p) => (
-          <div key={p.id} style={styles.card}>
-            <h2>{p.name}</h2>
-            <p>{p.price}</p>
-            <button style={styles.buy} onClick={() => buy(p.id)}>
-              Buy
-            </button>
-          </div>
-        ))}
-      </div>
+      <h2>Products</h2>
+
+      {PRODUCTS.map((p) => (
+        <div key={p.id} style={{ margin: 10, padding: 10, border: "1px solid gray" }}>
+          {p.name} - €{p.price}
+          <button onClick={() => addToCart(p)}>Add</button>
+        </div>
+      ))}
+
+      <h2>Cart</h2>
+
+      {cart.map((c) => (
+        <div key={c.id}>
+          {c.name}
+          <button onClick={() => removeFromCart(c.id)}>Remove</button>
+        </div>
+      ))}
+
+      {cart.length > 0 && (
+        <button onClick={checkout} style={{ marginTop: 20 }}>
+          Checkout (Create Ticket)
+        </button>
+      )}
     </div>
   );
 }
-
-const styles = {
-  body: {
-    background: "black",
-    color: "white",
-    minHeight: "100vh",
-    padding: 40,
-    textAlign: "center",
-    fontFamily: "Arial"
-  },
-  title: {
-    fontSize: 40,
-    marginBottom: 30
-  },
-  login: {
-    padding: 12,
-    background: "#5865F2",
-    color: "white",
-    border: "none",
-    borderRadius: 10,
-    cursor: "pointer"
-  },
-  grid: {
-    display: "flex",
-    gap: 20,
-    justifyContent: "center",
-    marginTop: 40,
-    flexWrap: "wrap"
-  },
-  card: {
-    background: "#111",
-    padding: 20,
-    borderRadius: 15,
-    width: 180,
-    border: "1px solid #333"
-  },
-  buy: {
-    marginTop: 10,
-    padding: 10,
-    width: "100%",
-    background: "#00c853",
-    border: "none",
-    borderRadius: 10,
-    cursor: "pointer"
-  }
-};
